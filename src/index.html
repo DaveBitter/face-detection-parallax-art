@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta httpEquiv='Content-Type' content='text/html; charset=utf-8' />
+    <meta httpEquiv='content-language' content='en' />
+    <meta name='viewport' id='viewporttag' content='width=device-width, user-scalable=no, initial-scale=1' />
+
+    <link rel='apple-touch-icon' sizes='57x57' href='./favicons/apple-icon-57x57.png' />
+    <link rel='apple-touch-icon' sizes='60x60' href='./favicons/apple-icon-60x60.png' />
+    <link rel='apple-touch-icon' sizes='72x72' href='./favicons/apple-icon-72x72.png' />
+    <link rel='apple-touch-icon' sizes='76x76' href='./favicons/apple-icon-76x76.png' />
+    <link rel='apple-touch-icon' sizes='114x114' href='./favicons/apple-icon-114x114.png' />
+    <link rel='apple-touch-icon' sizes='120x120' href='./favicons/apple-icon-120x120.png' />
+    <link rel='apple-touch-icon' sizes='144x144' href='./favicons/apple-icon-144x144.png' />
+    <link rel='apple-touch-icon' sizes='152x152' href='./favicons/apple-icon-152x152.png' />
+    <link rel='apple-touch-icon' sizes='180x180' href='./favicons/apple-icon-180x180.png' />
+    <link rel='icon' type='image/png' sizes='192x192' href='./favicons/android-icon-192x192.png' />
+    <link rel='icon' type='image/png' sizes='32x32' href='./favicons/favicon-32x32.png' />
+    <link rel='icon' type='image/png' sizes='96x96' href='./favicons/favicon-96x96.png' />
+    <link rel='icon' type='image/png' sizes='16x16' href='./favicons/favicon-16x16.png' />
+
+    <meta name='msapplication-TileColor' content='#222222' />
+    <meta name='msapplication-TileImage' content='./favicons/ms-icon-144x144.png' />
+
+    <meta name='theme-color' content='#222222'></meta>
+
+    <title>Face Detection Parallax Art</title>
+    <meta name='description' content="Parallax Art driven by browser-native face detection." />
+    <link rel="stylesheet" href="./style.css" />
+    <script type="module" src="./app.js"></script>
+  </head>
+  <body>
+    <video class="video" data-video></video>
+    <video class="video-placeholder" data-video-placeholder></video>
+
+    <div class="face-debug">
+      <span class="face-debug__box" data-face-debug-box-face></span>
+      <span class="face-debug__box" data-face-debug-box-eye-left></span>
+      <span class="face-debug__box" data-face-debug-box-eye-right></span>
+      <span class="face-debug__box" data-face-debug-box-nose></span>
+      <span class="face-debug__box" data-face-debug-box-mouth></span>
+    </div>
+
+    <div class="art">
+      <div class="art__image-wrapper">
+        <img
+          class="art__background"
+          src="./art/mona_lisa_background.png"
+        ></div>
+        <div class="art__foreground-wrapper">
+          <img
+            class="art__foreground"
+            src="./art/mona_lisa_foreground.png"
+            data-art-foreground
+          />
+        </div>
+      </div>
+    </div>
+
+  </body>
+</html>
