@@ -31,20 +31,70 @@
     <script type="module" src="./app.js"></script>
   </head>
   <body>
-    <video class="video" data-video></video>
-    <video class="video-placeholder" data-video-placeholder></video>
+    <div class="input-container" data-input-container>
+      <video class="video" data-video></video>
+      <video class="video-placeholder" data-video-placeholder></video>
 
-    <div class="face-debug">
-      <span class="face-debug__box" data-face-debug-box-face></span>
-      <span class="face-debug__box" data-face-debug-box-eye-left></span>
-      <span class="face-debug__box" data-face-debug-box-eye-right></span>
-      <span class="face-debug__box" data-face-debug-box-nose></span>
-      <span class="face-debug__box" data-face-debug-box-mouth></span>
-    </div>
+      <div class="face-debug">
+        <span class="face-debug__box" data-face-debug-box-face></span>
+        <span class="face-debug__box" data-face-debug-box-eye-left></span>
+        <span class="face-debug__box" data-face-debug-box-eye-right></span>
+        <span class="face-debug__box" data-face-debug-box-nose></span>
+        <span class="face-debug__box" data-face-debug-box-mouth></span>
+      </div>
 
-    <div class="art">
-      <div class="art__image-wrapper">
-        <img
+      <dl class="detections">
+        <div class="detections__item">
+          <dt class="detections__title">
+            <img
+            class="detections__icon"
+            src="./icons/face.svg"
+            alt="face"
+            />
+          </dt>
+          <dd class="detections__data" data-detection-output-face>-</dd>
+        </div>
+        <div class="detections__item">
+          <dt class="detections__title" data-side="l">
+            <img
+            class="detections__icon"
+            src="./icons/eye.svg"
+            alt="left eye"
+            />
+          </dt>
+          <dd class="detections__data" data-detection-output-eye-left>-</dd>
+        </div>
+        <div class="detections__item">
+          <dt class="detections__title" data-side="r">
+            <img
+            class="detections__icon"
+            src="./icons/eye.svg"
+            alt="right eye"
+            />
+          </dt>
+          <dd class="detections__data" data-detection-output-eye-right>-</dd>
+        </div>
+        <div class="detections__item">
+          <dt class="detections__title">
+            <img class="detections__icon" src="./icons/nose.svg" alt="nose" />
+          </dt>
+          <dd class="detections__data" data-detection-output-nose>-</dd>
+        </div>
+        <div class="detections__item">
+          <dt class="detections__title">
+            <img
+            class="detections__icon"
+            src="./icons/mouth.svg"
+            alt="mouth"
+            />
+          </dt>
+          <dd class="detections__data" data-detection-output-mouth>-</dd>
+        </div>
+
+      </div>
+        <div class="art">
+          <div class="art__image-wrapper">
+            <img
           class="art__background"
           src="./art/mona_lisa_background.png"
         ></div>

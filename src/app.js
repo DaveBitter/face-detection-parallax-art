@@ -1,4 +1,7 @@
+const detections = ['face', 'eye-left', 'eye-right', 'nose', 'mouth'];
+
 const elements = {
+  inputContainer: document.querySelector('[data-input-container]'),
   video: document.querySelector('[data-video]'),
   videoPlaceholder: document.querySelector('[data-video-placeholder]'),
   faceDebugBoxes: {
@@ -8,16 +11,54 @@ const elements = {
     nose: document.querySelector('[data-face-debug-box-nose]'),
     mouth: document.querySelector('[data-face-debug-box-mouth]')
   },
-  artForeground: document.querySelector('[data-art-foreground]')
+  artForeground: document.querySelector('[data-art-foreground]'),
+  outputs: detections.reduce(
+    (acc, cur) => ({
+      ...acc,
+      [cur]: document.querySelector(`[data-detection-output-${cur}]`)
+    }),
+    {}
+  )
 };
 
 const state = {};
 
 const mapFaceDetectionBoundingBoxFromIntrinsicSize = faceDetectionBoundingBox => {
-  const factorX =
-    elements.video.scrollWidth / elements.videoPlaceholder.scrollWidth;
-  const factorY =
-    elements.video.scrollHeight / elements.videoPlaceholder.scrollHeight;
+  const videoWidthByAspectRatio =
+    elements.video.scrollHeight *
+    (elements.videoPlaceholder.scrollWidth /
+      elements.videoPlaceholder.scrollHeight);
+
+  const videoHeightByAspectRatio =
+    elements.video.scrollWidth *
+    (elements.videoPlaceholder.scrollHeight /
+      elements.videoPlaceholder.scrollWidth);
+
+  let factorX;
+  let factorY;
+
+  const inputContainerIsPortrait =
+    elements.inputContainer.getBoundingClientRect().height >
+    elements.inputContainer.getBoundingClientRect().width;
+
+  elements.videoPlaceholder.style.minWidth =
+    elements.videoPlaceholder.scrollWidth + 'px';
+  elements.videoPlaceholder.style.minHeight =
+    elements.videoPlaceholder.scrollHeight + 'px';
+
+  if (inputContainerIsPortrait) {
+    factorY =
+      elements.video.scrollHeight / elements.videoPlaceholder.scrollHeight;
+    factorX = videoWidthByAspectRatio / elements.videoPlaceholder.scrollWidth;
+    elements.video.style.setProperty('--video-width', 'unset');
+    elements.video.style.setProperty('--video-height', '100%');
+  } else {
+    factorY = videoHeightByAspectRatio / elements.videoPlaceholder.scrollHeight;
+    factorX =
+      elements.video.scrollWidth / elements.videoPlaceholder.scrollWidth;
+    elements.video.style.setProperty('--video-width', '100%');
+    elements.video.style.setProperty('--video-height', 'unset');
+  }
 
   return {
     top: factorY * faceDetectionBoundingBox.top,
@@ -122,6 +163,15 @@ const getFaceDetection = async faceDetector => {
   return mappedLandmarkBoundingBoxes;
 };
 
+const outputDetectionValues = faceDetections => {
+  faceDetections.forEach(({ type, boundingBox }) => {
+    const { top, left, width, height } = boundingBox;
+    elements.outputs[type].innerHTML = `${parseInt(top)}, ${parseInt(
+      left
+    )}, ${parseInt(width)}, ${parseInt(height)}`;
+  });
+};
+
 const drawDebugBoxes = faceDetections => {
   faceDetections.forEach(({ type, boundingBox }) => {
     elements.faceDebugBoxes[type].style.setProperty(
@@ -143,6 +193,21 @@ const drawDebugBoxes = faceDetections => {
   });
 };
 
+const updateArt = () => {
+  elements.artForeground.style.setProperty(
+    '--art-foreground-rotate-x',
+    `-${parseInt(offsetTop / 40)}deg`
+  );
+  elements.artForeground.style.setProperty(
+    '--art-foreground-rotate-y',
+    `${parseInt(offsetLeft / 20 - 30)}deg`
+  );
+  elements.artForeground.style.setProperty(
+    '--art-foreground-scale',
+    `${parseFloat(1 + offsetWidth / 1000).toFixed(2)}`
+  );
+};
+
 const start = async () => {
   await navigator.mediaDevices
     .getUserMedia({
@@ -157,20 +222,9 @@ const start = async () => {
   setInterval(async () => {
     const faceDetections = await getFaceDetection(faceDetector);
 
-    elements.artForeground.style.setProperty(
-      '--art-foreground-rotate-x',
-      `${parseInt(offsetTop / 10)}deg`
-    );
-    elements.artForeground.style.setProperty(
-      '--art-foreground-rotate-y',
-      `${parseInt(offsetLeft / 50)}deg`
-    );
-    elements.artForeground.style.setProperty(
-      '--art-foreground-scale',
-      `${parseFloat(offsetWidth / 200).toFixed(1)}`
-    );
-
     drawDebugBoxes(faceDetections);
+    updateArt(faceDetections);
+    outputDetectionValues(faceDetections);
   }, 100);
 };
 
