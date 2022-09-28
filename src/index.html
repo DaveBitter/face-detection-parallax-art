@@ -30,7 +30,7 @@
     <link rel="stylesheet" href="./style.css" />
     <script type="module" src="./app.js"></script>
   </head>
-  <body>
+  <body data-supported="true">
     <div class="input-container" data-input-container>
       <video class="video" data-video></video>
       <video class="video-placeholder" data-video-placeholder></video>
@@ -108,5 +108,17 @@
       </div>
     </div>
 
+    <div class="notice" data-unsupported-notice>
+      <div class="notice__content">
+        <h1 class="notice__heading">Oh no!</h1>
+        <img class="notice__icon" src="./icons/face-detection.svg" />
+        <p class="notice__copy">This demo uses an experimental Chrome API to do native browser Face Detection.<br>In order to view this demo:</p>
+        <ol class="notice__list">
+          <li class="notice__list-item">Use Chrome</li>
+          <li class="notice__list-item">Got to <a href='chrome://flags' target="_blank">chrome://flags</a></li>
+          <li class="notice__list-item">Turn on <pre>#enable-experimental-web-platform-features</pre></li>
+        </ol>
+      </div>
+    </div>
   </body>
 </html>

@@ -208,15 +208,7 @@ const updateArt = () => {
   );
 };
 
-const start = async () => {
-  await navigator.mediaDevices
-    .getUserMedia({
-      video: true,
-      audio: false
-    })
-    .then(onUserMedia)
-    .catch(alert);
-
+const startDetection = () => {
   const faceDetector = new window.FaceDetector();
 
   setInterval(async () => {
@@ -226,6 +218,26 @@ const start = async () => {
     updateArt(faceDetections);
     outputDetectionValues(faceDetections);
   }, 100);
+};
+
+const hideUnsupportedNotice = () => {
+  document.body.dataset.supported = 'false';
+};
+
+const initWebcamStreams = async () => {
+  await navigator.mediaDevices
+    .getUserMedia({
+      video: true,
+      audio: false
+    })
+    .then(onUserMedia)
+    .catch(alert);
+};
+
+const start = () => {
+  initWebcamStreams();
+
+  'FaceDetector' in window ? startDetection() : hideUnsupportedNotice();
 };
 
 start();
