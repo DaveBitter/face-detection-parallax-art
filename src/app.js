@@ -1,6 +1,7 @@
 const detections = ['face', 'eye-left', 'eye-right', 'nose', 'mouth'];
 
 const elements = {
+  webcamSelect: document.querySelector('[data-webcam-select]'),
   inputContainer: document.querySelector('[data-input-container]'),
   video: document.querySelector('[data-video]'),
   videoPlaceholder: document.querySelector('[data-video-placeholder]'),
@@ -21,7 +22,9 @@ const elements = {
   )
 };
 
-const state = {};
+const state = {
+  hasFilledWebcamOptions: false
+};
 
 const mapFaceDetectionBoundingBoxFromIntrinsicSize = faceDetectionBoundingBox => {
   const videoWidthByAspectRatio =
@@ -77,8 +80,8 @@ const loadVideoStream = stream =>
     elements.videoPlaceholder.addEventListener('loadedmetadata', resolve);
   });
 
-const onUserMedia = stream =>
-  new Promise(async resolve => {
+const onUserMedia = stream => {
+  return new Promise(async resolve => {
     await loadVideoStream(stream);
 
     elements.video.play();
@@ -86,6 +89,7 @@ const onUserMedia = stream =>
 
     resolve();
   });
+};
 
 let prevLeft;
 let prevTop;
@@ -94,7 +98,9 @@ let offsetLeft;
 let offsetTop;
 let offsetWidth;
 const getFaceDetection = async faceDetector => {
-  const [face] = await faceDetector.detect(elements.videoPlaceholder);
+  const [face] = await faceDetector
+    .detect(elements.videoPlaceholder)
+    .catch(resetDebugBoxes);
 
   if (!face) {
     return;
@@ -172,6 +178,27 @@ const outputDetectionValues = faceDetections => {
   });
 };
 
+const resetDebugBoxes = () => {
+  Object.keys(elements.faceDebugBoxes).forEach(key => {
+    elements.faceDebugBoxes[key].style.setProperty(
+      '--debug-box-translate-x',
+      'unset'
+    );
+    elements.faceDebugBoxes[key].style.setProperty(
+      '--debug-box-translate-y',
+      'unset'
+    );
+    elements.faceDebugBoxes[key].style.setProperty(
+      '--debug-box-width',
+      'unset'
+    );
+    elements.faceDebugBoxes[key].style.setProperty(
+      '--debug-box-height',
+      'unset'
+    );
+  });
+};
+
 const drawDebugBoxes = faceDetections => {
   faceDetections.forEach(({ type, boundingBox }) => {
     elements.faceDebugBoxes[type].style.setProperty(
@@ -212,7 +239,13 @@ const startDetection = () => {
   const faceDetector = new window.FaceDetector();
 
   setInterval(async () => {
-    const faceDetections = await getFaceDetection(faceDetector);
+    const faceDetections = await getFaceDetection(faceDetector).catch(
+      resetDebugBoxes
+    );
+
+    if (!faceDetections) {
+      return;
+    }
 
     drawDebugBoxes(faceDetections);
     updateArt(faceDetections);
@@ -224,10 +257,38 @@ const hideUnsupportedNotice = () => {
   document.body.dataset.supported = 'false';
 };
 
-const initWebcamStreams = async () => {
+const initWebcamStreams = async deviceIdToUse => {
+  const mediaDevices = await navigator.mediaDevices.enumerateDevices();
+  const videoDevices = mediaDevices.filter(
+    mediaDevice => mediaDevice.kind === 'videoinput'
+  );
+
+  !state.hasFilledWebcamOptions &&
+    videoDevices.forEach((videoDevice, index) => {
+      const option = document.createElement('option');
+      const label = videoDevice.label.split(' (')[0] || `Camera ${index++}`;
+      const textNode = document.createTextNode(label);
+
+      option.value = videoDevice.deviceId;
+      option.appendChild(textNode);
+      elements.webcamSelect.appendChild(option);
+
+      state.hasFilledWebcamOptions = true;
+    });
+
+  const cachedVideoDeviceId = localStorage.getItem('selectedVideoDeviceId');
+
+  const selectedDeviceId =
+    deviceIdToUse || cachedVideoDeviceId || videoDevices[0].deviceId;
+  elements.webcamSelect.value = selectedDeviceId;
+
+  localStorage.setItem('selectedVideoDeviceId', selectedDeviceId);
+
   await navigator.mediaDevices
     .getUserMedia({
-      video: true,
+      video: {
+        deviceId: selectedDeviceId
+      },
       audio: false
     })
     .then(onUserMedia)
@@ -236,6 +297,10 @@ const initWebcamStreams = async () => {
 
 const start = () => {
   initWebcamStreams();
+
+  elements.webcamSelect.addEventListener('change', ({ target }) => {
+    return initWebcamStreams(target.value);
+  });
 
   'FaceDetector' in window ? startDetection() : hideUnsupportedNotice();
 };

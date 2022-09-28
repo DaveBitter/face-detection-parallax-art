@@ -246,6 +246,33 @@ body[data-supported='false'] .detections {
   transition: transform 500ms ease;
 }
 
+.webcam-selector {
+  position: absolute;
+  top: 3vh;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+@media (min-width: 80rem) {
+  .webcam-selector {
+    left: 25%;
+  }
+}
+
+body[data-supported='false'] .webcam-selector {
+  display: none;
+}
+
+.webcam-selector__select {
+  padding: 1rem;
+  border-radius: 1rem;
+  border-color: transparent;
+  border-right: 1rem solid transparent;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(1rem);
+}
+
 .notice {
   z-index: 10000;
   position: fixed;
